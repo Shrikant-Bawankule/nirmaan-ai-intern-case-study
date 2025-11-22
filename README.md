@@ -27,7 +27,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-App opens at: **[http://localhost:8501](http://localhost:8501)**
+App opens at: **(https://nirmaan-ai.streamlit.app/)**
 
 ---
 
