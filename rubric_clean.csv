@@ -1,0 +1,63 @@
+﻿Creteria ,Metric,Scoring creteria ,Key Words ,Score Attributed ,Total score ,Sample data score 
+Content & Structure,Salutation Level ( based the type of saluation provided give the Score),No Salulation,-,0,5,4
+,,Normal ,"Hi, Hello ",2,,
+,,Good ,"Good Morning, Good Afternoon, Good Evening, Good Day, Hello everyone",4,,
+,,Excellent ,"If it includes: "" I am excited to introduce/ Feeling great""",5,,
+,"Key word Presence 
+(Does the text include name, age, class, school, family, hobbies/interests, goals, and unique point) and give point accordingly ",Must Have (each has score of 4) ,"Name, 
+Age
+School/Class, 
+Family, 
+Hobies/Interest/ what they like to do in Free time. ",20,20,20
+,,Good to have  (each has score of 2) ,"About Family, 
+Origin Location ( ""I am from/ Parents are from"")
+Ambition/Goal/Dream
+Interesting thing/ fun fact/something unique about them
+Strengths or Achivements",10,10,4
+,"Flow (Is the introduction following the order, Salutation --> Name --> Mandatory details --> Optional Details --> Closing",Order followed ,"Order : 
+>>Salutation 
+>> Basic details ( Name, Age, Class/school, Place) 
+>>Additional Details ( all good to have) 
+>>Closing ",5,5,5
+,,Order Not followed ,,0,,
+Speech Rate,Speech rate(words/minute) or WPM,Too Fast ,>161 WPM,2,10,10
+,,Fast , 141 -160 WPM,6,,
+,,Ideal , 111 -140 WPM,10,,
+,,Slow,81 -110 WPM,6,,
+,,Too slow ,< 80 WPM,2,,
+Language & Grammar,"Grammar errors count using Language Tool
+Use Python Language tool can be used to identify the errors ","Grammer Score =1−min(errors per 100 words​/10,1)",>0.9,10,10,10
+,,,0.7 to 0.89,8,,
+,,,0.5 to 0.69,6,,
+,,,0.3 to 0.49,4,,
+,,,<0.3,2,,
+,"Vocabulary richness 
+Option 1 : TTR ( Type token error 0, easy and simple)
+Option 2 : MTLD using python Libraries  (Measure of Textual Lexical Diversity)
+
+Any option is preferable. ","Currently TTR is used 
+TTR =Distinct words ÷ total words",0.9–1.0,10,10,6
+,,,0.7–0.89,8,,
+,,,0.5–0.69,6,,
+,,,0.3–0.49,4,,
+,,,0–0.29,2,,
+Clarity ,"Filler Word Rate 
+Filler words List (um, uh, like, you know, so, actually, basically, right, i mean, well, kinda, sort of, okay, hmm, ah)
+Find the Filler words either using Python Libraries or using keyword search.",Filler Word Rate = (Number of filler words ÷ Total words) × 100,0 to 3,15,15,15
+,,,4 to 6,12,,
+,,,7 to 9,9,,
+,,,10 to 12,6,,
+,,,13  and above ,3,,
+Engagement,"Sentiment/positivity (Transcript-based emotion model)
+
+Positive (enthusiastic, confident, grateful)
+Neutral (factual, calm)
+Negative (disinterested, anxious, dull)
+
+Using any open source  libraries for sentiment analysis like VADER or  spaCy","Currently, we calculate the probability (0 to 1) of positive words only
+using VADER ",>=0.9,15,15,12
+,,,0.7 to 0.89,12,,
+,,,0.5 to 0.69,9,,
+,,,0.3 to 0.49,6,,
+,,,<0.3,3,,
+,,,,,100,86
