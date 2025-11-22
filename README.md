@@ -1,43 +1,70 @@
-# Nirmaan AI — Communication Scorer (Case Study)
-
-A Streamlit web application built for the **Nirmaan AI Intern Case Study**, designed to evaluate student self-introductions using a **rubric-based scoring engine** combined with **NLP, semantic similarity, grammar analysis, filler-word detection, sentiment analysis, and vocabulary richness**.
-
-This project provides:
-- A clean dark-themed Streamlit UI  
-- Automatic analysis of student transcripts  
-- Rule-based scoring aligned with the official rubric  
-- Optional semantic similarity signals using Sentence Transformers  
-- JSON output suitable for downstream automation  
-- Quick Stats (word count, characters, sentences, WPM estimation)  
-- No hard-coded paths — fully GitHub-friendly
+Here is a **short, clean, professional README** you can **copy–paste directly** into GitHub:
 
 ---
 
-## 🚀 Features
+# **Nirmaan AI – Communication Scorer**
 
-### ✔ Rule-based rubric scoring
-Implements all 6 official rubric criteria:
-1. **Content & Structure**  
-2. **Speech Rate**  
-3. **Language & Grammar**  
-4. **Vocabulary Richness**  
-5. **Clarity**  
-6. **Engagement**
-
-### ✔ NLP-enhanced scoring
-- Grammar analysis (LanguageTool with heuristic fallback)  
-- Filler-word frequency detection  
-- TTR vocabulary richness  
-- Sentiment scoring using VADER  
-- Optional semantic similarity (Sentence Transformers)
-
-### ✔ Polished Dark UI
-- Modern card-based layout  
-- Quick stats for transcript input  
-- Interactive table of per-criterion scores  
-- Downloadable JSON results  
+A Streamlit-based evaluation tool built for the **Nirmaan AI Intern Case Study**.
+The system scores student self-introductions using a **rubric-driven model** combined with **NLP techniques**, including grammar analysis, sentiment scoring, filler-word detection, vocabulary richness, and optional semantic similarity.
 
 ---
 
-## 📂 Project Structure
+## **Features**
 
+* Rubric-based scoring aligned with the official case-study criteria
+* Content & Structure, Speech Rate, Grammar, Vocabulary, Clarity, Engagement
+* Modern dark-themed Streamlit UI
+* Supports text input, file upload, and sample text
+* Generates detailed JSON output for automation or reporting
+* Fully project-relative paths (GitHub & deployment friendly)
+
+---
+
+## **Run Locally**
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+App opens at: **[http://localhost:8501](http://localhost:8501)**
+
+---
+
+## **Project Structure**
+
+```
+app.py                  # Streamlit UI
+rubric_loader.py        # Loads rubric from XLSX/CSV
+scoring_logic.py        # Complete scoring engine
+Case study for interns.xlsx
+Sample text for case study.txt
+requirements.txt
+```
+
+---
+
+## **Usage**
+
+1. Paste or upload a transcript
+2. Click **Score**
+3. View per-criterion scores, weighted contributions, and JSON output
+4. Download the final scoring JSON
+
+---
+
+## **Notes**
+
+* Semantic model downloads on first run
+* Grammar checking uses LanguageTool (with fallback if Java is unavailable)
+
+---
+
+If you want, I can also generate:
+
+* a `.gitignore`
+* a LICENSE file
+* repo badges
+* Streamlit Cloud deployment instructions
+
+Just tell me!
