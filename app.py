@@ -2,30 +2,30 @@
 import io
 import json
 from pathlib import Path
-from typing import List, Tuple, Dict, Any, Optional, Union
+from typing import List, Tuple, Dict, Any, Optional
 
 import streamlit as st
 import pandas as pd
 
-# third-party parsers
+# file parsers
 import PyPDF2
 import docx
 
-# project modules (must exist in project root)
+# project modules (must be in same folder)
 from rubric_loader import load_rubric
 from scoring_logic import score_transcript
 
-# constants: project-relative files
+# Project-relative constants
 RUBRIC_FILE = Path("Case study for interns.xlsx")
 SAMPLE_FILE = Path("Sample text for case study.txt")
 
 st.set_page_config(page_title="Nirmaan AI — Communication Scorer", layout="wide")
 
-# minimal dark CSS for neat output
+# minimal dark CSS
 CSS = """
 <style>
 body, .stApp { background-color: #0f1113; color: #e6e6e6; }
-.section-card { background: #0f1113; border-radius: 10px; padding: 16px; border: 1px solid rgba(255,255,255,0.04); }
+.section-card { background: #0f1113; border-radius: 10px; padding: 16px; border: 1px solid rgba(255,255,255,0.04); margin-bottom: 12px; }
 textarea, .stTextArea textarea { background: #151719 !important; color: #e6e6e6 !important; border-radius: 8px; }
 .stButton>button { background: linear-gradient(180deg,#1f8aa5,#16707f); color: white; border-radius: 8px; padding: 8px 12px; }
 .stat-box { background: #111316; border-radius: 8px; padding: 10px; border: 1px solid rgba(255,255,255,0.03); text-align:center; }
@@ -36,9 +36,9 @@ textarea, .stTextArea textarea { background: #151719 !important; color: #e6e6e6 
 st.markdown(CSS, unsafe_allow_html=True)
 
 st.title("Nirmaan AI — Communication Scorer")
-st.write("Paste text, upload files (txt/pdf/docx), or use the sample. Scores are rubric-based with optional semantic signals.")
+st.write("Paste text, upload files (txt/pdf/docx), or use the sample. Scores are rubric-driven with optional semantic signals.")
 
-# load rubric (project relative)
+# Load rubric
 try:
     rubric = load_rubric(RUBRIC_FILE if RUBRIC_FILE.exists() else None)
 except Exception as e:
@@ -64,9 +64,11 @@ with left_col:
     st.markdown("<div class='section-card'>", unsafe_allow_html=True)
     st.header("Input")
 
+    # Input mode
     input_mode = st.radio("Input method", ["Paste text", "Upload files", "Use sample (project file)"])
 
-    transcript_text = ""
+    # Initialize holders
+    transcript_text: str = ""
     uploaded_files = []
 
     if input_mode == "Paste text":
@@ -77,28 +79,38 @@ with left_col:
             type=["txt", "pdf", "docx"],
             accept_multiple_files=True
         )
-    else:  # sample
+    else:  # sample file mode
         if SAMPLE_FILE.exists():
             transcript_text = SAMPLE_FILE.read_text(encoding="utf-8", errors="replace")
             transcript_text = st.text_area("Sample transcript (editable)", value=transcript_text, height=260)
         else:
             transcript_text = st.text_area("Sample transcript (editable)", value="Sample file not found.", height=260)
 
-    mode = st.radio("Scoring mode", ["Score single transcript (paste/sample)", "Score uploaded files individually", "Combine uploaded files and score as one transcript"])
+    # Smart scoring mode: if files uploaded, present file scoring options only
+    if uploaded_files:
+        mode = st.radio(
+            "Scoring mode",
+            ["Score uploaded files individually", "Combine uploaded files and score as one transcript"],
+            index=0
+        )
+    else:
+        mode = st.radio(
+            "Scoring mode",
+            ["Score single transcript (paste/sample)"],
+            index=0
+        )
 
     run_score = st.button("Score")
-
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # helpers for extraction
+    # ---------- helper functions ----------
     def extract_text_from_pdf_stream(stream: io.BytesIO) -> str:
         try:
             reader = PyPDF2.PdfReader(stream)
             pages = []
             for p in reader.pages:
-                text = p.extract_text()
-                if text:
-                    pages.append(text)
+                text = p.extract_text() or ""
+                pages.append(text)
             return "\n".join(pages)
         except Exception:
             try:
@@ -130,7 +142,6 @@ with left_col:
             return extract_text_from_pdf_stream(stream), name
         if suffix == ".docx":
             return extract_text_from_docx_stream(stream), name
-        # fallback
         try:
             return raw.decode("utf-8"), name
         except Exception:
@@ -142,7 +153,7 @@ with left_col:
         sentences = max(0, len([s for s in text.replace("?", ".").replace("!", ".").split(".") if s.strip()]))
         return {"words": words, "chars": chars, "sentences": sentences}
 
-    # perform scoring based on selected mode
+    # ---------- scoring execution ----------
     results: List[Dict[str, Any]] = []
 
     if run_score:
@@ -152,18 +163,18 @@ with left_col:
             else:
                 try:
                     res = score_transcript(transcript_text, rubric, duration_sec=None)
-                    res_struct = {
+                    results.append({
                         "filename": "pasted_input" if input_mode == "Paste text" else "sample_file",
                         "overall_score": res.get("overall_score"),
                         "per_criterion": res.get("per_criterion"),
                         "words": res.get("words")
-                    }
-                    results.append(res_struct)
+                    })
                 except Exception as e:
                     st.error(f"Scoring failed: {e}")
         else:
+            # Files present: ensure uploaded_files is not empty
             if not uploaded_files:
-                st.warning("Please upload one or more files.")
+                st.warning("Please upload one or more files to score.")
             else:
                 extracted_list: List[Tuple[str, str]] = []
                 for uf in uploaded_files:
@@ -185,7 +196,7 @@ with left_col:
                             })
                         except Exception as e:
                             st.error(f"Scoring failed for {name}: {e}")
-                else:  # combine and score
+                else:  # combine
                     combined_text = "\n\n".join([t for (_, t) in extracted_list if t.strip()])
                     if not combined_text.strip():
                         st.warning("Combined content is empty.")
@@ -201,7 +212,7 @@ with left_col:
                         except Exception as e:
                             st.error(f"Scoring failed for combined upload: {e}")
 
-    # display results
+    # ---------- display results ----------
     if results:
         st.success("Scoring complete")
         for r in results:
@@ -209,7 +220,6 @@ with left_col:
             st.subheader(f"Result — {r.get('filename')}")
             st.markdown(f"**Overall score:** {r.get('overall_score', 0.0):.2f} / 100")
             per = r.get("per_criterion", [])
-            # show table
             rows = []
             for p in per:
                 rows.append({
@@ -222,22 +232,19 @@ with left_col:
             if rows:
                 df = pd.DataFrame(rows)
                 st.dataframe(df, height=240)
-            # pretty JSON output
             pretty = json.dumps(r, indent=2, ensure_ascii=False)
             st.markdown("<div class='json-box'>", unsafe_allow_html=True)
             st.markdown(f"<pre>{pretty}</pre>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
-            # download button
-            json_bytes = pretty.encode("utf-8")
             st.download_button(
                 label="Download JSON",
-                data=json_bytes,
+                data=pretty.encode("utf-8"),
                 file_name=f"{r.get('filename')}_scoring.json",
                 mime="application/json"
             )
             st.markdown("</div>", unsafe_allow_html=True)
 
-    # quick stats when nothing scored yet (live preview of pasted/sample)
+    # Quick stats UI if nothing scored yet and using paste/sample
     if not results and input_mode in ("Paste text", "Use sample (project file)"):
         st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
         st.markdown("<div class='section-card'>", unsafe_allow_html=True)
